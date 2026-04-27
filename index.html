@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DiabetesIQ · Diabetes Risk Predictor</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+[data-theme="light"]{
+  --bg:#f7f5f0;
+  --bg2:#eeeae2;
+  --surface:#ffffff;
+  --surface2:#f3f0ea;
+  --surface3:#e8e4db;
+  --border:#ddd9d0;
+  --border2:#c9c4b8;
+  --text:#18160f;
+  --text2:#5a5649;
+  --text3:#9a9488;
+  --accent:#2563a8;
+  --accent-bg:#eff6ff;
+  --accent-border:#bfdbfe;
+  --red:#b91c1c;
+  --red-bg:#fef2f2;
+  --red-border:#fecaca;
+  --green:#166534;
+  --green-bg:#f0fdf4;
+  --green-border:#bbf7d0;
+  --amber:#92400e;
+  --amber-bg:#fffbeb;
+  --amber-border:#fde68a;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.04);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.08);
+  --chat-user-bg:#2563a8;
+  --chat-user-text:#fff;
+  --chat-bot-bg:#f3f0ea;
+  --chat-bot-text:#18160f;
+}
+[data-theme="dark"]{
+  --bg:#0f0e0b;
+  --bg2:#161410;
+  --surface:#1c1a15;
+  --surface2:#242118;
+  --surface3:#2e2b22;
+  --border:#353127;
+  --border2:#46412f;
+  --text:#f0ede6;
+  --text2:#a09880;
+  --text3:#6b6452;
+  --accent:#60a5fa;
+  --accent-bg:#1e3a5f;
+  --accent-border:#1d4ed8;
+  --red:#f87171;
+  --red-bg:#3b1515;
+  --red-border:#7f1d1d;
+  --green:#86efac;
+  --green-bg:#14351f;
+  --green-border:#166534;
+  --amber:#fcd34d;
+  --amber-bg:#3b2910;
+  --amber-border:#92400e;
+  --shadow:0 1px 3px rgba(0,0,0,.3),0 4px 12px rgba(0,0,0,.2);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.4);
+  --chat-user-bg:#1d4ed8;
+  --chat-user-text:#fff;
+  --chat-bot-bg:#242118;
+  --chat-bot-text:#f0ede6;
+}
+
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Geist',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  transition:background .3s,color .3s;
+}
+
+/* ── NAV ── */
+.nav{
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(16px);
+  background:color-mix(in srgb,var(--surface) 85%,transparent);
+  border-bottom:1px solid var(--border);
+  padding:0 2rem;
+  height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.nav-brand{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Instrument Serif',serif;
+  font-size:20px;letter-spacing:-.01em;
+  color:var(--text);text-decoration:none;
+}
+.nav-brand-dot{
+  width:28px;height:28px;background:var(--accent);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+}
+.nav-brand-dot svg{display:block;}
+.nav-right{display:flex;align-items:center;gap:8px;}
+
+.theme-btn{
+  width:36px;height:36px;border-radius:10px;
+  border:1px solid var(--border);background:var(--surface2);
+  color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s,color .2s;font-size:16px;
+}
+.theme-btn:hover{background:var(--surface3);}
+
+.chat-toggle-btn{
+  height:36px;padding:0 14px;border-radius:10px;
+  border:1px solid var(--border);background:var(--surface2);
+  color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:500;font-family:'Geist',sans-serif;
+  transition:background .2s,color .2s;
+}
+.chat-toggle-btn:hover{background:var(--surface3);}
+.chat-dot{
+  width:7px;height:7px;background:#22c55e;border-radius:50%;
+  animation:pulse-dot 2s infinite;
+}
+@keyframes pulse-dot{
+  0%,100%{opacity:1;transform:scale(1);}
+  50%{opacity:.6;transform:scale(1.3);}
+}
+
+/* ── LAYOUT ── */
+.layout{
+  max-width:1100px;margin:0 auto;padding:2rem 1.5rem 4rem;
+  display:grid;grid-template-columns:1fr;gap:2rem;
+}
+
+/* ── HERO ── */
+.hero{text-align:center;padding:2.5rem 0 1rem;}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--accent-bg);color:var(--accent);
+  border:1px solid var(--accent-border);
+  font-size:12px;font-weight:500;letter-spacing:.05em;
+  padding:4px 14px;border-radius:100px;margin-bottom:1.25rem;
+}
+.hero h1{
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(36px,6vw,58px);
+  letter-spacing:-.02em;line-height:1.1;
+  margin-bottom:.75rem;
+}
+.hero h1 em{font-style:italic;color:var(--text2);}
+.hero-sub{
+  font-size:15px;color:var(--text2);
+  max-width:520px;margin:0 auto;line-height:1.7;
+}
+
+/* ── CARD ── */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  animation:fadeUp .4s ease both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.card-header{
+  padding:1.25rem 1.75rem;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.card-header-title{
+  font-size:12px;font-weight:600;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--text3);
+}
+.card-body{padding:1.75rem;}
+
+/* ── INFO STRIP ── */
+.info-strip{
+  display:flex;gap:10px;align-items:flex-start;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:12px;padding:12px 16px;margin-bottom:1.5rem;
+  font-size:12.5px;color:var(--text2);line-height:1.5;
+}
+.info-strip-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+
+/* ── GRID ── */
+.fields-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;}
+@media(max-width:560px){.fields-grid{grid-template-columns:1fr;}}
+
+/* ── FIELD ── */
+.field{display:flex;flex-direction:column;gap:6px;}
+.field-label{
+  font-size:13px;font-weight:500;color:var(--text);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.field-label span{font-size:11px;color:var(--text3);font-weight:400;}
+.field-input{
+  height:44px;padding:0 14px;
+  border:1.5px solid var(--border);border-radius:12px;
+  background:var(--surface);color:var(--text);
+  font-size:15px;font-family:'Geist Mono',monospace;
+  transition:border-color .15s,box-shadow .15s,background .15s;
+  -moz-appearance:textfield;
+}
+.field-input::-webkit-inner-spin-button,
+.field-input::-webkit-outer-spin-button{-webkit-appearance:none;}
+.field-input:focus{
+  outline:none;
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 15%,transparent);
+}
+.field-hint{font-size:11px;color:var(--text3);}
+
+/* ── DIVIDER ── */
+.divider{border:none;border-top:1px solid var(--border);margin:1.5rem 0;}
+
+/* ── BUTTON ── */
+.btn-primary{
+  width:100%;height:50px;
+  background:var(--text);color:var(--bg);
+  border:none;border-radius:14px;
+  font-size:15px;font-weight:500;font-family:'Geist',sans-serif;
+  cursor:pointer;letter-spacing:.01em;
+  transition:opacity .15s,transform .1s,box-shadow .2s;
+  position:relative;overflow:hidden;
+}
+.btn-primary::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.08));
+  pointer-events:none;
+}
+.btn-primary:hover{opacity:.88;box-shadow:var(--shadow-lg);}
+.btn-primary:active{transform:scale(.99);}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed;}
+
+/* ── RESULT ── */
+.result-section{display:none;}
+.result-section.show{display:block;animation:fadeUp .4s ease both;}
+
+.result-banner{
+  border-radius:16px;padding:1.5rem;margin-bottom:1.25rem;
+  display:flex;gap:16px;align-items:flex-start;
+  border:1px solid;
+}
+.result-banner.diabetic{background:var(--red-bg);border-color:var(--red-border);}
+.result-banner.borderline{background:var(--amber-bg);border-color:var(--amber-border);}
+.result-banner.healthy{background:var(--green-bg);border-color:var(--green-border);}
+
+.result-icon{
+  width:52px;height:52px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;flex-shrink:0;
+  border:1px solid;
+}
+.result-banner.diabetic .result-icon{background:color-mix(in srgb,var(--red-bg) 60%,var(--surface));border-color:var(--red-border);}
+.result-banner.borderline .result-icon{background:color-mix(in srgb,var(--amber-bg) 60%,var(--surface));border-color:var(--amber-border);}
+.result-banner.healthy .result-icon{background:color-mix(in srgb,var(--green-bg) 60%,var(--surface));border-color:var(--green-border);}
+
+.result-tag{
+  font-size:11px;font-weight:600;letter-spacing:.07em;
+  text-transform:uppercase;margin-bottom:5px;
+}
+.result-banner.diabetic .result-tag{color:var(--red);}
+.result-banner.borderline .result-tag{color:var(--amber);}
+.result-banner.healthy .result-tag{color:var(--green);}
+
+.result-headline{
+  font-family:'Instrument Serif',serif;
+  font-size:22px;letter-spacing:-.01em;margin-bottom:6px;
+}
+.result-desc{font-size:13.5px;color:var(--text2);line-height:1.65;}
+
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.25rem;}
+.stat{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:14px;padding:14px;text-align:center;
+}
+.stat-val{
+  font-size:24px;font-weight:600;
+  font-family:'Geist Mono',monospace;letter-spacing:-.02em;
+  margin-bottom:3px;
+}
+.stat-lbl{font-size:11px;color:var(--text3);}
+
+/* ── PROB BAR ── */
+.prob-wrap{margin:1.25rem 0;}
+.prob-labels{
+  display:flex;justify-content:space-between;
+  font-size:11.5px;color:var(--text3);margin-bottom:8px;
+}
+.prob-track{
+  height:10px;background:var(--surface3);border-radius:100px;
+  overflow:visible;position:relative;
+}
+.prob-fill{
+  height:100%;border-radius:100px;
+  transition:width .7s cubic-bezier(.16,1,.3,1);
+  position:relative;
+}
+.prob-fill.diabetic{background:linear-gradient(90deg,#fca5a5,#dc2626);}
+.prob-fill.borderline{background:linear-gradient(90deg,#fcd34d,#d97706);}
+.prob-fill.healthy{background:linear-gradient(90deg,#86efac,#16a34a);}
+.prob-thumb{
+  position:absolute;right:-5px;top:50%;transform:translateY(-50%);
+  width:10px;height:10px;border-radius:50%;background:var(--surface);
+  border:2px solid currentColor;box-shadow:0 0 0 3px color-mix(in srgb,currentColor 20%,transparent);
+}
+
+/* ── CHIPS ── */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:.25rem;}
+.chip{
+  font-size:12px;padding:5px 12px;border-radius:100px;
+  border:1px solid var(--border);background:var(--surface2);
+  color:var(--text2);display:flex;align-items:center;gap:5px;
+  font-family:'Geist Mono',monospace;
+  transition:transform .15s;
+}
+.chip:hover{transform:translateY(-1px);}
+.chip.up{border-color:var(--red-border);background:var(--red-bg);color:var(--red);}
+.chip.down{border-color:var(--green-border);background:var(--green-bg);color:var(--green);}
+
+.reset-btn{
+  width:100%;height:42px;margin-top:1rem;
+  background:none;border:1px solid var(--border);border-radius:12px;
+  font-size:13.5px;font-family:'Geist',sans-serif;color:var(--text2);
+  cursor:pointer;transition:background .15s;
+}
+.reset-btn:hover{background:var(--surface2);}
+
+.error-msg{
+  font-size:12.5px;color:var(--red);margin-top:.5rem;
+  display:none;padding:8px 12px;background:var(--red-bg);
+  border:1px solid var(--red-border);border-radius:10px;
+}
+.error-msg.show{display:block;}
+
+/* ── CHATBOT ── */
+.chat-panel{
+  position:fixed;bottom:24px;right:24px;z-index:200;
+  width:380px;max-height:600px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;box-shadow:var(--shadow-lg);
+  display:none;flex-direction:column;overflow:hidden;
+  animation:slideUp .3s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+.chat-panel.open{display:flex;}
+
+.chat-header{
+  padding:14px 16px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface2);
+}
+.chat-avatar{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:16px;flex-shrink:0;
+}
+.chat-header-info{flex:1;}
+.chat-header-name{font-size:14px;font-weight:600;line-height:1;}
+.chat-header-status{
+  font-size:11px;color:var(--text3);margin-top:2px;
+  display:flex;align-items:center;gap:4px;
+}
+.chat-status-dot{width:6px;height:6px;background:#22c55e;border-radius:50%;}
+.chat-close{
+  width:28px;height:28px;border-radius:8px;
+  border:1px solid var(--border);background:var(--surface);
+  color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+}
+.chat-close:hover{background:var(--surface3);}
+
+.chat-messages{
+  flex:1;overflow-y:auto;padding:14px;
+  display:flex;flex-direction:column;gap:10px;
+  min-height:0;max-height:430px;
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+}
+
+.msg{display:flex;gap:8px;animation:fadeUp .2s ease both;}
+.msg.user{flex-direction:row-reverse;}
+
+.msg-bubble{
+  max-width:85%;padding:10px 14px;border-radius:16px;
+  font-size:13.5px;line-height:1.6;
+}
+.msg.bot .msg-bubble{
+  background:var(--chat-bot-bg);color:var(--chat-bot-text);
+  border-bottom-left-radius:4px;
+  border:1px solid var(--border);
+}
+.msg.user .msg-bubble{
+  background:var(--chat-user-bg);color:var(--chat-user-text);
+  border-bottom-right-radius:4px;
+}
+
+.msg-avatar{
+  width:28px;height:28px;border-radius:8px;flex-shrink:0;margin-top:2px;
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+}
+.msg.bot .msg-avatar{background:var(--surface3);color:var(--text2);}
+.msg.user .msg-avatar{background:var(--accent);color:#fff;}
+
+.typing-indicator{display:flex;gap:4px;padding:4px 0;}
+.typing-indicator span{
+  width:6px;height:6px;background:var(--text3);border-radius:50%;
+  animation:bounce .8s infinite;
+}
+.typing-indicator span:nth-child(2){animation-delay:.15s;}
+.typing-indicator span:nth-child(3){animation-delay:.3s;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+
+.chat-suggestions{
+  display:flex;flex-wrap:wrap;gap:6px;
+  padding:10px 14px;border-top:1px solid var(--border);
+}
+.suggestion-chip{
+  font-size:11.5px;padding:5px 10px;border-radius:100px;
+  border:1px solid var(--border);background:var(--surface2);
+  color:var(--text2);cursor:pointer;transition:background .15s,border-color .15s;
+  font-family:'Geist',sans-serif;
+}
+.suggestion-chip:hover{background:var(--accent-bg);border-color:var(--accent-border);color:var(--accent);}
+
+.chat-input-row{
+  display:flex;gap:8px;align-items:flex-end;
+  padding:12px 14px;border-top:1px solid var(--border);
+  background:var(--surface);
+}
+.chat-input{
+  flex:1;min-height:38px;max-height:100px;
+  padding:9px 13px;border:1.5px solid var(--border);border-radius:12px;
+  background:var(--surface2);color:var(--text);
+  font-size:13.5px;font-family:'Geist',sans-serif;
+  resize:none;line-height:1.5;
+  transition:border-color .15s,box-shadow .15s;
+  overflow-y:auto;
+}
+.chat-input:focus{
+  outline:none;border-color:var(--accent);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 12%,transparent);
+}
+.chat-send{
+  width:38px;height:38px;border-radius:11px;flex-shrink:0;
+  background:var(--accent);color:#fff;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .15s,transform .1s;
+}
+.chat-send:hover{opacity:.85;}
+.chat-send:active{transform:scale(.95);}
+.chat-send:disabled{opacity:.4;cursor:not-allowed;}
+
+/* ── FAB ── */
+.chat-fab{
+  position:fixed;bottom:24px;right:24px;z-index:199;
+  width:54px;height:54px;border-radius:16px;
+  background:var(--text);color:var(--bg);
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--shadow-lg);
+  transition:transform .2s,opacity .2s;
+  font-size:22px;
+}
+.chat-fab:hover{transform:scale(1.06);}
+.chat-fab.hidden{display:none;}
+.fab-badge{
+  position:absolute;top:-4px;right:-4px;
+  width:14px;height:14px;background:#22c55e;
+  border-radius:50%;border:2px solid var(--surface);
+}
+
+/* ── DISCLAIMER ── */
+.disclaimer{
+  text-align:center;font-size:11.5px;color:var(--text3);
+  margin-top:2.5rem;line-height:1.7;
+  padding:0 1rem;
+}
+
+/* ── SECTION LABEL ── */
+.section-label{
+  font-size:12px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--text3);
+  margin-bottom:.75rem;
+}
+
+@media(max-width:480px){
+  .chat-panel{width:calc(100vw - 24px);right:12px;bottom:80px;}
+  .chat-fab{bottom:16px;right:16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-brand" href="#">
+    <div class="nav-brand-dot">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M8 2v4M8 10v4M2 8h4M10 8h4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </div>
+    DiabetesIQ
+  </a>
+  <div class="nav-right">
+    <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme" id="themeBtn">🌙</button>
+    <button class="chat-toggle-btn" onclick="toggleChat()">
+      <span class="chat-dot"></span>
+      Medical AI
+    </button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="layout">
+  <div class="hero">
+    <div class="hero-eyebrow">
+      <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg>
+      Logistic Regression · 75.3% Accuracy · Pima Indians Dataset
+    </div>
+    <h1>Predict your<br/><em>diabetes risk</em></h1>
+    <p class="hero-sub">Enter your clinical values below. Predictions run entirely in-browser using exact model coefficients derived from your notebook.</p>
+  </div>
+
+  <!-- INPUT CARD -->
+  <div class="card" id="inputCard">
+    <div class="card-header">
+      <span class="card-header-title">Clinical Parameters</span>
+      <span style="font-size:12px;color:var(--text3);">8 features</span>
+    </div>
+    <div class="card-body">
+      <div class="info-strip">
+        <span class="info-strip-icon">ℹ</span>
+        <span>Zeros in Glucose, Blood Pressure, Skin Thickness, Insulin, and BMI are treated as missing and auto-imputed with dataset medians — exactly as in the notebook preprocessing.</span>
+      </div>
+      <div class="fields-grid">
+        <div class="field">
+          <div class="field-label">Pregnancies <span>0–17</span></div>
+          <input type="number" class="field-input" id="pregnancies" min="0" max="20" step="1" placeholder="e.g. 2"/>
+          <span class="field-hint">Number of times pregnant</span>
+        </div>
+        <div class="field">
+          <div class="field-label">Glucose <span>mg/dL</span></div>
+          <input type="number" class="field-input" id="glucose" min="0" max="300" placeholder="e.g. 120"/>
+          <span class="field-hint">Plasma glucose (2h OGTT)</span>
+        </div>
+        <div class="field">
+          <div class="field-label">Blood Pressure <span>mmHg</span></div>
+          <input type="number" class="field-input" id="bloodpressure" min="0" max="140" placeholder="e.g. 70"/>
+          <span class="field-hint">Diastolic blood pressure</span>
+        </div>
+        <div class="field">
+          <div class="field-label">Skin Thickness <span>mm</span></div>
+          <input type="number" class="field-input" id="skinthickness" min="0" max="100" placeholder="e.g. 20"/>
+          <span class="field-hint">Triceps skin fold thickness</span>
+        </div>
+        <div class="field">
+          <div class="field-label">Insulin <span>μU/mL</span></div>
+          <input type="number" class="field-input" id="insulin" min="0" max="900" placeholder="e.g. 80"/>
+          <span class="field-hint">2-hour serum insulin</span>
+        </div>
+        <div class="field">
+          <div class="field-label">BMI <span>kg/m²</span></div>
+          <input type="number" class="field-input" id="bmi" min="0" max="70" step="0.1" placeholder="e.g. 28.5"/>
+          <span class="field-hint">Body mass index</span>
+        </div>
+        <div class="field">
+          <div class="field-label">Diabetes Pedigree <span>0.08–2.42</span></div>
+          <input type="number" class="field-input" id="dpf" min="0" max="3" step="0.001" placeholder="e.g. 0.45"/>
+          <span class="field-hint">Family history function score</span>
+        </div>
+        <div class="field">
+          <div class="field-label">Age <span>years</span></div>
+          <input type="number" class="field-input" id="age" min="21" max="90" placeholder="e.g. 35"/>
+          <span class="field-hint">Age in years (min 21)</span>
+        </div>
+      </div>
+      <hr class="divider"/>
+      <button class="btn-primary" onclick="predict()">Run Prediction →</button>
+      <div class="error-msg" id="errorMsg">Please enter your Age to continue. All other missing values will use dataset medians.</div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result-section" id="resultSection">
+    <div class="result-banner" id="resultBanner">
+      <div class="result-icon" id="resultIcon"></div>
+      <div>
+        <div class="result-tag" id="resultTag"></div>
+        <div class="result-headline" id="resultHeadline"></div>
+        <div class="result-desc" id="resultDesc"></div>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="stat-val" id="statProb">—</div>
+        <div class="stat-lbl">Probability</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="statPred">—</div>
+        <div class="stat-lbl">Prediction</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="statScore">—</div>
+        <div class="stat-lbl">Linear Score</div>
+      </div>
+    </div>
+
+    <div class="prob-wrap">
+      <div class="prob-labels">
+        <span>Non-Diabetic (0%)</span>
+        <span id="probPct" style="font-weight:600;color:var(--text);">—</span>
+        <span>Diabetic (100%)</span>
+      </div>
+      <div class="prob-track">
+        <div class="prob-fill" id="probFill" style="width:0%">
+          <div class="prob-thumb"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:1rem;">
+      <div class="card-header">
+        <span class="card-header-title">Feature Contributions</span>
+        <span style="font-size:11px;color:var(--text3);">↑ raises risk · ↓ lowers risk</span>
+      </div>
+      <div class="card-body" style="padding-top:1rem;">
+        <div class="chips" id="factorChips"></div>
+      </div>
+    </div>
+
+    <button class="reset-btn" onclick="resetForm()">← Enter new values</button>
+  </div>
+
+  <p class="disclaimer">
+    DiabetesIQ replicates LogisticRegression(C=1.0) trained on the Pima Indians Diabetes Dataset (768 samples, 80/20 split, random_state=42).<br/>
+    Preprocessing: zero → median imputation on 5 clinical fields → StandardScaler normalization.<br/>
+    <strong>For educational purposes only. This is not medical advice. Always consult a qualified healthcare professional.</strong>
+  </p>
+</div>
+
+<!-- CHAT FAB -->
+<button class="chat-fab" id="chatFab" onclick="toggleChat()" title="Open Medical AI">
+  🩺
+  <div class="fab-badge"></div>
+</button>
+
+<!-- CHAT PANEL -->
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-header">
+    <div class="chat-avatar">🩺</div>
+    <div class="chat-header-info">
+      <div class="chat-header-name">Medical AI Assistant</div>
+      <div class="chat-header-status">
+        <span class="chat-status-dot"></span>
+        Online · Powered by Claude
+      </div>
+    </div>
+    <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+
+  <div class="chat-messages" id="chatMessages">
+    <div class="msg bot">
+      <div class="msg-avatar">🩺</div>
+      <div class="msg-bubble">
+        Hi! I'm your Medical AI assistant. I can answer questions about diabetes, blood sugar, BMI, nutrition, medications, symptoms, and general health topics.<br/><br/>
+        How can I help you today?
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-suggestions" id="suggestions">
+    <button class="suggestion-chip" onclick="sendSuggestion('What are the early symptoms of diabetes?')">Early symptoms?</button>
+    <button class="suggestion-chip" onclick="sendSuggestion('What is a normal blood glucose level?')">Normal glucose?</button>
+    <button class="suggestion-chip" onclick="sendSuggestion('How can I lower my diabetes risk?')">Reduce risk</button>
+    <button class="suggestion-chip" onclick="sendSuggestion('What does BMI mean for diabetes?')">BMI & diabetes</button>
+  </div>
+
+  <div class="chat-input-row">
+    <textarea class="chat-input" id="chatInput" placeholder="Ask a medical question…" rows="1"
+      onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+    <button class="chat-send" id="sendBtn" onclick="sendMessage()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M2 8h12M10 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+// ── THEME ──
+const themeBtn = document.getElementById('themeBtn');
+function toggleTheme(){
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  themeBtn.textContent = isDark ? '🌙' : '☀️';
+}
+// auto-detect system preference
+if(window.matchMedia('(prefers-color-scheme: dark)').matches){
+  document.documentElement.setAttribute('data-theme','dark');
+  themeBtn.textContent = '☀️';
+}
+
+// ── CHAT TOGGLE ──
+let chatOpen = false;
+function toggleChat(){
+  chatOpen = !chatOpen;
+  const panel = document.getElementById('chatPanel');
+  const fab = document.getElementById('chatFab');
+  if(chatOpen){
+    panel.classList.add('open');
+    fab.classList.add('hidden');
+    document.getElementById('chatInput').focus();
+  } else {
+    panel.classList.remove('open');
+    fab.classList.remove('hidden');
+  }
+}
+
+// ── MODEL PARAMS ──
+const MEDIANS = {Pregnancies:3,Glucose:117,BloodPressure:72,SkinThickness:29,Insulin:125,BMI:32.3,DiabetesPedigreeFunction:0.3725,Age:29};
+const IMPUTE_COLS = new Set(['Glucose','BloodPressure','SkinThickness','Insulin','BMI']);
+const SCALER_MEAN = [3.742671009771987,121.80781758957654,72.22964169381108,28.71172638436482,140.47719869706842,32.35162866449512,0.4691677524429967,32.9071661237785];
+const SCALER_STD  = [3.310564970320029,30.080654947615013,12.089421205473117,8.40505272748747,88.12911741744672,6.929868950180097,0.33657233160174427,11.494065064569595];
+const INTERCEPT   = -0.876796359470378;
+const COEFS       = [0.22297779667201836,1.1026815303600126,-0.15153971979020486,0.06883608033412905,-0.13825212992427072,0.6888391878872977,0.2036347305191336,0.39240956082462786];
+const FEAT_KEYS   = ['Pregnancies','Glucose','BloodPressure','SkinThickness','Insulin','BMI','DiabetesPedigreeFunction','Age'];
+const FEAT_LABELS = ['Pregnancies','Glucose','Blood Pressure','Skin Thickness','Insulin','BMI','Diabetes Pedigree','Age'];
+const INPUT_IDS   = ['pregnancies','glucose','bloodpressure','skinthickness','insulin','bmi','dpf','age'];
+
+function sigmoid(x){ return 1/(1+Math.exp(-x)); }
+
+function getRaw(id, feat){
+  const v = parseFloat(document.getElementById(id).value);
+  if(isNaN(v) || (v===0 && IMPUTE_COLS.has(feat))) return MEDIANS[feat];
+  if(isNaN(v)) return MEDIANS[feat];
+  return v;
+}
+
+function predict(){
+  const age = parseFloat(document.getElementById('age').value);
+  const errEl = document.getElementById('errorMsg');
+  if(isNaN(age)||age<=0){ errEl.classList.add('show'); return; }
+  errEl.classList.remove('show');
+
+  const raw = INPUT_IDS.map((id,i)=>getRaw(id,FEAT_KEYS[i]));
+  const z   = raw.map((v,i)=>(v-SCALER_MEAN[i])/SCALER_STD[i]);
+  let score = INTERCEPT;
+  const contrib = z.map((zv,i)=>{ const c=COEFS[i]*zv; score+=c; return c; });
+  const prob = sigmoid(score);
+  const pred = prob>=0.5?1:0;
+
+  showResult(prob,score,pred,contrib,raw);
+}
+
+function showResult(prob,score,pred,contrib,raw){
+  const pct = Math.round(prob*100);
+  let cls,icon,tag,headline,desc;
+  if(pred===1&&prob>=0.7){
+    cls='diabetic';icon='⚠️';tag='High Risk · Diabetic';
+    headline='Elevated diabetes risk detected';
+    desc='Your clinical values suggest a high likelihood of diabetes. Please consult a healthcare professional for proper diagnosis, screening, and guidance on next steps.';
+  } else if(pred===1){
+    cls='borderline';icon='⚡';tag='Moderate Risk · Diabetic';
+    headline='Moderate diabetes risk detected';
+    desc='Your values cross the model\'s decision threshold. Consider speaking with a doctor about glucose screening and preventive lifestyle adjustments.';
+  } else if(prob>=0.35){
+    cls='borderline';icon='⚡';tag='Low-Moderate Risk · Non-Diabetic';
+    headline='Below threshold — worth monitoring';
+    desc='Your values fall below the decision boundary but are not negligible. Regular monitoring of glucose, BMI, and blood pressure is advisable.';
+  } else {
+    cls='healthy';icon='✅';tag='Low Risk · Non-Diabetic';
+    headline='Low diabetes risk detected';
+    desc='Your clinical values indicate a lower likelihood of diabetes. Maintain a healthy lifestyle to keep these levels in the safe range.';
+  }
+
+  document.getElementById('resultBanner').className=`result-banner ${cls}`;
+  document.getElementById('resultIcon').textContent=icon;
+  document.getElementById('resultTag').textContent=tag;
+  document.getElementById('resultHeadline').textContent=headline;
+  document.getElementById('resultDesc').textContent=desc;
+  document.getElementById('statProb').textContent=pct+'%';
+  document.getElementById('statPred').textContent=pred===1?'Diabetic':'Non-Diabetic';
+  document.getElementById('statScore').textContent=score.toFixed(3);
+  document.getElementById('probPct').textContent=pct+'%';
+
+  const fill=document.getElementById('probFill');
+  fill.style.width=pct+'%';
+  fill.className=`prob-fill ${cls}`;
+
+  // chips sorted by |contribution|
+  const sorted=[...contrib.map((c,i)=>({c,label:FEAT_LABELS[i],raw:raw[i]}))].sort((a,b)=>Math.abs(b.c)-Math.abs(a.c));
+  const chips=document.getElementById('factorChips');
+  chips.innerHTML='';
+  sorted.forEach(({c,label,raw:rv})=>{
+    const d=document.createElement('div');
+    const cls2=c>0.05?'up':c<-0.05?'down':'';
+    const arr=c>0.05?'↑':c<-0.05?'↓':'→';
+    d.className=`chip ${cls2}`;
+    d.textContent=`${arr} ${label}: ${Number.isInteger(rv)?rv:rv.toFixed(1)}`;
+    chips.appendChild(d);
+  });
+
+  document.getElementById('inputCard').style.display='none';
+  const rs=document.getElementById('resultSection');
+  rs.classList.add('show');
+  rs.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function resetForm(){
+  document.getElementById('inputCard').style.display='block';
+  document.getElementById('resultSection').classList.remove('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── CHATBOT (100% OFFLINE — NO API) ──
+
+function autoResize(el){
+  el.style.height='auto';
+  el.style.height=Math.min(el.scrollHeight,100)+'px';
+}
+function handleKey(e){
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}
+}
+function sendSuggestion(text){
+  document.getElementById('chatInput').value=text;
+  document.getElementById('suggestions').style.display='none';
+  sendMessage();
+}
+function appendMsg(role,text){
+  const wrap=document.getElementById('chatMessages');
+  const div=document.createElement('div');
+  div.className=`msg ${role}`;
+  const av=document.createElement('div');
+  av.className='msg-avatar';
+  av.textContent=role==='bot'?'🩺':'👤';
+  const bubble=document.createElement('div');
+  bubble.className='msg-bubble';
+  bubble.innerHTML=text.replace(/\n/g,'<br/>');
+  div.appendChild(av);div.appendChild(bubble);
+  wrap.appendChild(div);
+  wrap.scrollTop=wrap.scrollHeight;
+}
+function appendTyping(){
+  const wrap=document.getElementById('chatMessages');
+  const div=document.createElement('div');
+  div.className='msg bot';div.id='typing-msg';
+  const av=document.createElement('div');av.className='msg-avatar';av.textContent='🩺';
+  const bubble=document.createElement('div');bubble.className='msg-bubble';
+  bubble.innerHTML='<div class="typing-indicator"><span></span><span></span><span></span></div>';
+  div.appendChild(av);div.appendChild(bubble);
+  wrap.appendChild(div);wrap.scrollTop=wrap.scrollHeight;
+}
+function removeTyping(){
+  const el=document.getElementById('typing-msg');if(el)el.remove();
+}
+
+// ── KNOWLEDGE BASE ──
+const KB = [
+  {
+    keys:['symptom','sign','feel','feeling','symptoms of diabetes','how do i know','tell if'],
+    reply:`Common symptoms of diabetes include:\n• Frequent urination (especially at night)\n• Excessive thirst and hunger\n• Unexplained weight loss\n• Blurred vision\n• Slow-healing cuts or wounds\n• Tingling or numbness in hands/feet\n• Extreme fatigue\n\nType 2 diabetes can develop silently with no symptoms for years — that's why regular screening is important. If you notice several of these signs, please see a doctor for a proper blood test.`
+  },
+  {
+    keys:['type 1','type1','t1d','juvenile diabetes'],
+    reply:`Type 1 Diabetes is an autoimmune condition where the immune system attacks insulin-producing beta cells in the pancreas.\n\nKey facts:\n• Usually diagnosed in children and young adults\n• The body produces little to no insulin\n• Requires daily insulin injections or an insulin pump\n• Cannot be prevented or cured, but is manageable\n• Accounts for about 5–10% of all diabetes cases\n\nPeople with Type 1 must carefully monitor blood glucose levels throughout the day. Always work closely with an endocrinologist for management.`
+  },
+  {
+    keys:['type 2','type2','t2d','adult diabetes'],
+    reply:`Type 2 Diabetes is the most common form, accounting for 90–95% of cases.\n\nKey facts:\n• The body doesn't use insulin effectively (insulin resistance)\n• Often linked to lifestyle, weight, age, and family history\n• Can often be managed or delayed through diet and exercise\n• May require oral medications (like Metformin) or insulin\n• Risk increases significantly after age 45\n\nThe good news: Type 2 diabetes is largely preventable. Losing even 5–7% of body weight can significantly lower your risk. Please consult a healthcare provider for personalised advice.`
+  },
+  {
+    keys:['gestational','pregnancy diabetes','pregnant'],
+    reply:`Gestational Diabetes develops during pregnancy when the body can't produce enough insulin to meet increased needs.\n\nKey facts:\n• Occurs in about 2–10% of pregnancies\n• Usually resolves after delivery\n• Increases risk of Type 2 diabetes later in life (for both mother and child)\n• Managed through diet, exercise, blood sugar monitoring, and sometimes insulin\n• Screening is typically done between weeks 24–28 of pregnancy\n\nIf you're pregnant and concerned, talk to your OB-GYN about glucose screening as early as possible.`
+  },
+  {
+    keys:['glucose','blood sugar','blood glucose','sugar level','normal sugar','normal glucose'],
+    reply:`Normal Blood Glucose Levels (for adults without diabetes):\n\n• Fasting (8+ hours): 70–99 mg/dL\n• 2 hours after eating: less than 140 mg/dL\n• Random: less than 200 mg/dL\n\nPre-diabetes ranges:\n• Fasting: 100–125 mg/dL\n• 2-hour post-meal: 140–199 mg/dL\n\nDiabetes is diagnosed when:\n• Fasting ≥ 126 mg/dL on two occasions\n• 2-hour post-meal ≥ 200 mg/dL\n• HbA1c ≥ 6.5%\n\nAlways get results interpreted by your doctor in the context of your full health picture.`
+  },
+  {
+    keys:['hba1c','a1c','glycated','hemoglobin','haemoglobin a1c'],
+    reply:`HbA1c (Glycated Haemoglobin) measures your average blood sugar over the past 2–3 months.\n\nInterpretation:\n• Below 5.7% — Normal\n• 5.7% – 6.4% — Pre-diabetes\n• 6.5% or above — Diabetes\n\nFor people already diagnosed with diabetes:\n• Below 7% — Good control (general target)\n• 7–8% — Acceptable (some patients)\n• Above 8% — Needs improvement\n\nHbA1c is considered the gold standard for monitoring long-term diabetes management. It should be tested every 3–6 months for people with diabetes.`
+  },
+  {
+    keys:['insulin','inject','injection','insulin type','basal','bolus','rapid','long acting'],
+    reply:`Insulin Types and Their Uses:\n\n• Rapid-acting (e.g. Lispro, Aspart) — works in 15 min, peaks in 1 hr, used before meals\n• Short-acting (Regular) — works in 30 min, peaks in 2–3 hrs\n• Intermediate-acting (NPH) — peaks in 4–12 hrs, twice-daily dosing\n• Long-acting (Glargine, Detemir) — no peak, provides background insulin for 24 hrs\n• Ultra long-acting (Degludec) — lasts over 42 hours\n\nInsulin should only be used under medical supervision. Dosing is highly individualised. Never adjust your insulin dose without consulting your doctor or diabetes nurse.`
+  },
+  {
+    keys:['metformin','medication','medicine','drug','tablet','pill','glipizide','januvia','ozempic','victoza','sglt2','glp1'],
+    reply:`Common Diabetes Medications:\n\n• Metformin — first-line oral medication; reduces liver glucose production; very safe\n• SGLT2 inhibitors (e.g. Empagliflozin) — remove excess glucose via urine; also protect the heart\n• GLP-1 agonists (e.g. Ozempic/Semaglutide) — reduce appetite, lower blood sugar, aid weight loss\n• DPP-4 inhibitors (e.g. Sitagliptin/Januvia) — help the body release insulin after meals\n• Sulfonylureas (e.g. Glipizide) — stimulate insulin release; can cause hypoglycaemia\n• Insulin — used when oral medications aren't enough\n\nNever start, stop, or change medications without your doctor's guidance. Side effects and suitability vary greatly by individual.`
+  },
+  {
+    keys:['diet','food','eat','nutrition','meal','carb','carbohydrate','sugar food','glycemic','gi index'],
+    reply:`Diabetes-Friendly Diet Tips:\n\n✅ Foods to favour:\n• Non-starchy vegetables (spinach, broccoli, capsicum)\n• Whole grains (brown rice, oats, quinoa)\n• Legumes (lentils, chickpeas, beans)\n• Lean protein (chicken, fish, tofu)\n• Healthy fats (avocado, nuts, olive oil)\n• Low-GI fruits (berries, apples, pears)\n\n❌ Foods to limit:\n• Sugary drinks and fruit juices\n• White bread, white rice, refined pasta\n• Processed snacks and sweets\n• Fried foods and trans fats\n• Alcohol (raises and then drops blood sugar)\n\nA registered dietitian can create a personalised meal plan. Portion control and consistent meal timing are just as important as food choices.`
+  },
+  {
+    keys:['exercise','workout','physical activity','walk','running','gym','sport','active'],
+    reply:`Exercise and Diabetes Management:\n\nPhysical activity is one of the most powerful tools to manage or prevent diabetes.\n\nBenefits:\n• Lowers blood glucose directly (muscles use glucose for energy)\n• Improves insulin sensitivity for up to 24–48 hours after exercise\n• Helps with weight management\n• Reduces cardiovascular risk\n\nRecommendations:\n• Aim for 150 minutes/week of moderate aerobic activity (brisk walking, cycling, swimming)\n• Add 2–3 days/week of strength training\n• Break up long sitting periods every 30 minutes\n\nIf you're on insulin or certain medications, check blood sugar before and after exercise to avoid hypoglycaemia. Always get medical clearance before starting a new exercise programme.`
+  },
+  {
+    keys:['bmi','body mass','overweight','obese','obesity','weight','underweight'],
+    reply:`BMI (Body Mass Index) and Diabetes Risk:\n\nBMI = weight (kg) ÷ height² (m²)\n\nBMI Categories:\n• Below 18.5 — Underweight\n• 18.5 – 24.9 — Normal weight\n• 25.0 – 29.9 — Overweight\n• 30.0 and above — Obese\n\nBMI and diabetes risk:\n• A BMI above 25 significantly raises Type 2 diabetes risk\n• For South Asian populations, risk increases at BMI ≥ 23\n• Losing just 5–7% of body weight can reduce diabetes risk by up to 58%\n\nBMI is a screening tool, not a perfect measure of health. Body fat distribution (especially abdominal fat) also matters greatly. Talk to your doctor about your healthy weight range.`
+  },
+  {
+    keys:['blood pressure','hypertension','bp','systolic','diastolic','high bp'],
+    reply:`Blood Pressure and Diabetes:\n\nHigh blood pressure and diabetes frequently occur together and dramatically increase the risk of heart disease and stroke.\n\nTarget blood pressure for diabetics:\n• General target: below 130/80 mmHg\n• Some guidelines suggest below 140/90 mmHg\n\nNormal blood pressure ranges:\n• Normal: less than 120/80\n• Elevated: 120–129 / less than 80\n• High Stage 1: 130–139 / 80–89\n• High Stage 2: 140+ / 90+\n\nLifestyle tips to lower BP:\n• Reduce salt intake\n• Exercise regularly\n• Limit alcohol\n• Manage stress\n• Maintain healthy weight\n\nIf you have both diabetes and hypertension, regular monitoring and medication (if prescribed) are essential.`
+  },
+  {
+    keys:['cholesterol','lipid','triglyceride','hdl','ldl','fat in blood'],
+    reply:`Cholesterol and Diabetes:\n\nPeople with diabetes have a higher risk of abnormal cholesterol levels.\n\nKey lipid targets for diabetics:\n• LDL ("bad") cholesterol: below 100 mg/dL (or below 70 if high CV risk)\n• HDL ("good") cholesterol: above 40 mg/dL (men), above 50 mg/dL (women)\n• Triglycerides: below 150 mg/dL\n\nHow to improve cholesterol:\n• Eat more fibre (oats, beans, vegetables)\n• Reduce saturated fats (red meat, butter, full-fat dairy)\n• Avoid trans fats entirely\n• Exercise regularly\n• Statins may be prescribed by your doctor\n\nAnnual lipid panel testing is recommended for all adults with diabetes.`
+  },
+  {
+    keys:['prevent','prevention','avoid diabetes','reduce risk','prediabetes','pre-diabetes','pre diabetes'],
+    reply:`How to Prevent or Delay Type 2 Diabetes:\n\nIf you have pre-diabetes or high risk factors, these evidence-based steps can reduce your risk by up to 58%:\n\n1. Lose 5–7% of body weight if overweight\n2. Exercise at least 150 minutes per week (brisk walking is enough)\n3. Eat a balanced diet low in processed carbs and sugars\n4. Quit smoking — it raises insulin resistance\n5. Limit alcohol consumption\n6. Manage stress (chronic stress raises cortisol → raises blood sugar)\n7. Get 7–8 hours of quality sleep per night\n8. Monitor blood sugar regularly if at risk\n\nThe Diabetes Prevention Program (DPP) study proved lifestyle changes are more effective than medication for prevention. Start with small, sustainable changes today.`
+  },
+  {
+    keys:['hypoglycemia','hypo','low blood sugar','low sugar','sugar drop','blood sugar low','dizzy after insulin'],
+    reply:`Hypoglycaemia (Low Blood Sugar):\n\nHypoglycaemia occurs when blood glucose drops below 70 mg/dL.\n\nSymptoms:\n• Shakiness, sweating, dizziness\n• Rapid heartbeat, anxiety\n• Hunger, nausea\n• Confusion, difficulty concentrating\n• In severe cases: loss of consciousness\n\nImmediate treatment (Rule of 15):\n1. Eat 15g of fast-acting carbs (4 glucose tablets, 150ml fruit juice, or 3 tsp sugar)\n2. Wait 15 minutes and recheck blood sugar\n3. Repeat if still below 70 mg/dL\n4. Eat a small snack once stabilised\n\n⚠️ If the person is unconscious, call emergency services immediately. Do not give food or drink to an unconscious person.`
+  },
+  {
+    keys:['hyperglycemia','high blood sugar','high sugar','sugar high','high glucose','glucose high'],
+    reply:`Hyperglycaemia (High Blood Sugar):\n\nHyperglycaemia occurs when blood glucose rises above 180 mg/dL after meals or 130 mg/dL while fasting.\n\nCauses:\n• Too much food (especially carbs)\n• Missed medication or insulin dose\n• Illness, stress, or infection\n• Physical inactivity\n\nSymptoms:\n• Frequent urination, increased thirst\n• Headache, fatigue, blurred vision\n• Slow-healing wounds\n\nWhat to do:\n• Check and record your blood glucose\n• Drink water to stay hydrated\n• Light exercise can help lower glucose (if no ketones)\n• Contact your doctor if levels remain high or you feel very unwell\n\n⚠️ Persistent high blood sugar can lead to diabetic ketoacidosis (DKA) — a medical emergency. Seek immediate care if you have high glucose + vomiting + fruity-smelling breath.`
+  },
+  {
+    keys:['complication','kidney','nephropathy','retinopathy','eye','neuropathy','nerve','foot','amputation','heart disease','cardiovascular'],
+    reply:`Long-term Complications of Diabetes:\n\nPoorly controlled diabetes can damage multiple organ systems:\n\n👁️ Retinopathy (eyes) — damaged blood vessels in the retina; leading cause of blindness\n🫘 Nephropathy (kidneys) — kidney damage leading to chronic kidney disease\n🦶 Neuropathy (nerves) — tingling, pain, or numbness in feet and hands\n❤️ Cardiovascular disease — 2–4× higher risk of heart attack and stroke\n🦵 Foot complications — poor circulation and nerve damage can lead to ulcers\n🧠 Cognitive decline — increased risk of dementia and depression\n\nPrevention:\n• Keep blood sugar, blood pressure, and cholesterol in target range\n• Attend all regular check-ups (eye exams, kidney function, foot checks)\n• Don't smoke\n• Take medications as prescribed\n\nEarly detection and tight control prevent or slow all of these complications.`
+  },
+  {
+    keys:['stress','mental health','anxiety','depression','emotional','psychology','cope','burnout'],
+    reply:`Diabetes and Mental Health:\n\nLiving with diabetes can be emotionally challenging. Mental health is a crucial but often overlooked part of diabetes management.\n\nHow stress affects diabetes:\n• Stress hormones (cortisol, adrenaline) raise blood glucose directly\n• Mental health struggles can reduce motivation to manage diabetes\n• Diabetes distress and burnout are very real and common\n\nTips for managing emotional wellbeing:\n• Talk openly with your healthcare team about how you're feeling\n• Connect with diabetes support groups\n• Practice relaxation techniques: deep breathing, meditation, yoga\n• Exercise regularly — it's a proven mood booster\n• Set small, achievable goals to avoid feeling overwhelmed\n\nIf you're feeling persistently sad, hopeless, or overwhelmed, please speak with a mental health professional. You don't have to manage this alone.`
+  },
+  {
+    keys:['sleep','insomnia','tired','fatigue','rest','sleeping'],
+    reply:`Sleep and Diabetes:\n\nPoor sleep and diabetes have a two-way relationship — each makes the other worse.\n\nHow sleep affects blood sugar:\n• Less than 6 hours of sleep raises insulin resistance\n• Sleep deprivation increases cortisol and hunger hormones (ghrelin)\n• Night shifts and irregular sleep patterns raise Type 2 diabetes risk\n• Sleep apnoea (common in overweight people) significantly worsens glycaemic control\n\nTips for better sleep:\n• Aim for 7–9 hours per night\n• Keep a consistent sleep/wake schedule\n• Avoid screens 1 hour before bed\n• Keep bedroom cool and dark\n• Avoid caffeine after 2pm\n• Check blood sugar before bed to prevent night-time hypoglycaemia\n\nIf you snore loudly or wake up unrefreshed, get screened for sleep apnoea.`
+  },
+  {
+    keys:['pedigree','family history','hereditary','genetic','inherit','father mother diabetes'],
+    reply:`Diabetes Pedigree Function & Family History:\n\nThe Diabetes Pedigree Function (DPF) in this app scores your genetic risk based on family history of diabetes.\n\nDPF scale:\n• Low (0.08–0.3) — little to no family history\n• Moderate (0.3–0.7) — one or more relatives with diabetes\n• High (0.7–2.42) — strong family history across generations\n\nIf a close relative (parent, sibling) has Type 2 diabetes, your risk is 2–6× higher than average.\n\nHowever, family history is not destiny. Studies show lifestyle interventions are highly effective even in people with strong genetic predisposition. Regular screening starting at age 35 (or earlier if overweight) is especially important if you have family history.\n\nAlways discuss your family history with your doctor.`
+  },
+  {
+    keys:['test','testing','diagnose','diagnosis','screening','check','hba1c test','glucose test','fasting test'],
+    reply:`Diabetes Tests & Screening:\n\nThese are the main tests used to diagnose or monitor diabetes:\n\n🩸 Fasting Plasma Glucose (FPG)\n• Fast for 8+ hours, then blood is drawn\n• Normal: <100 mg/dL | Pre-diabetes: 100–125 | Diabetes: ≥126\n\n🥤 Oral Glucose Tolerance Test (OGTT)\n• Drink 75g glucose solution, blood drawn 2 hours later\n• Normal: <140 mg/dL | Pre-diabetes: 140–199 | Diabetes: ≥200\n\n🔬 HbA1c Test\n• No fasting required\n• Normal: <5.7% | Pre-diabetes: 5.7–6.4% | Diabetes: ≥6.5%\n\n⚡ Random Plasma Glucose\n• Blood drawn at any time\n• Diabetes suspected if ≥200 mg/dL with symptoms\n\nScreening recommended for:\n• Adults 35+ (every 3 years if normal)\n• Anyone overweight with one or more risk factors\n• Women who had gestational diabetes`
+  },
+  {
+    keys:['pregnancy','baby','conception','fertility','folic acid','pregnant with diabetes'],
+    reply:`Diabetes and Pregnancy:\n\nManaging diabetes during pregnancy is critical for both mother and baby.\n\nFor women with pre-existing diabetes:\n• Plan the pregnancy with your diabetes team\n• Aim for HbA1c below 6.5% before conception\n• Take folic acid supplements (5mg/day)\n• More frequent blood glucose monitoring is needed\n• Insulin is the safest medication during pregnancy\n\nRisks of uncontrolled diabetes in pregnancy:\n• Large baby (macrosomia) → difficult delivery\n• Pre-eclampsia (high blood pressure)\n• Higher risk of C-section\n• Baby may have low blood sugar after birth\n• Higher risk of miscarriage or stillbirth if poorly controlled\n\nWith careful management, women with diabetes can have healthy pregnancies. Work closely with both your OB-GYN and diabetes specialist throughout.`
+  },
+  {
+    keys:['alcohol','drink','beer','wine','spirits'],
+    reply:`Alcohol and Diabetes:\n\nAlcohol can cause both high and low blood sugar — sometimes hours after drinking.\n\nHow alcohol affects blood sugar:\n• Initially can cause hypoglycaemia (especially on an empty stomach)\n• Mixers and cocktails are high in sugar → cause spikes\n• Heavy drinking raises long-term blood sugar and blood pressure\n• Alcohol impairs your ability to recognise hypoglycaemia symptoms\n\nSafe drinking guidelines (if your doctor approves):\n• Women: max 1 standard drink/day\n• Men: max 2 standard drinks/day\n• Never drink on an empty stomach\n• Choose dry wine or spirits with sugar-free mixers\n• Wear a medical ID if you drink\n• Check blood sugar before and after drinking\n\nSome people with diabetes should avoid alcohol entirely. Ask your doctor what's right for you.`
+  },
+  {
+    keys:['app','tool','predictor','model','how does this work','accuracy','logistic regression','dataset','pima'],
+    reply:`About This App — DiabetesIQ:\n\n🔬 Model: Logistic Regression (C=1.0, scikit-learn)\n📊 Dataset: Pima Indians Diabetes Dataset (768 women, aged 21+)\n🎯 Accuracy: 75.3% on the test set\n\nPreprocessing pipeline:\n1. Zeros in Glucose, Blood Pressure, Skin Thickness, Insulin, BMI → replaced with dataset medians\n2. All 8 features standardised using StandardScaler (fit on training data)\n3. 80/20 train-test split with random_state=42\n\nThe model outputs a probability between 0–1. If ≥ 0.5, the prediction is Diabetic.\n\n⚠️ Important limitations:\n• Trained only on Pima Indian women aged 21–81\n• May not generalise to all populations\n• This is a demonstration tool, NOT a medical device\n\nAlways consult a qualified healthcare professional for actual diagnosis and treatment.`
+  },
+  {
+    keys:['hello','hi','hey','good morning','good evening','good afternoon','howdy','greetings'],
+    reply:`Hello! 👋 I'm your Medical AI assistant for DiabetesIQ.\n\nI can help you with questions about:\n• 🩸 Diabetes (Type 1, Type 2, gestational)\n• 📊 Blood glucose levels and HbA1c\n• 💊 Medications and insulin\n• 🥗 Diet, nutrition, and exercise\n• ❤️ Complications and prevention\n• 😴 Sleep, stress, and mental health\n• 🔬 Tests, screening, and diagnosis\n\nWhat would you like to know about today?`
+  },
+  {
+    keys:['thank','thanks','thank you','appreciate','helpful','great answer'],
+    reply:`You're very welcome! 😊\n\nRemember, while I can provide general health information, always consult your doctor or a qualified healthcare professional for personal medical advice, diagnosis, or treatment decisions.\n\nIs there anything else you'd like to know about diabetes or your health?`
+  },
+];
+
+const FALLBACK_RESPONSES = [
+  `That's a great health question! While I don't have a specific answer for that in my knowledge base, I'd recommend:\n\n• Speaking with your doctor or diabetes care team\n• Visiting diabetes.org or idf.org for reliable information\n• Calling a healthcare helpline in your area\n\nFeel free to ask me about diabetes symptoms, blood sugar levels, medications, diet, exercise, complications, or how this prediction tool works!`,
+  `I'm not sure I have enough information to answer that precisely. For accurate, personalised medical advice, please consult a qualified healthcare professional.\n\nHere are topics I can help with:\n• Blood glucose and HbA1c levels\n• Diabetes types (1, 2, gestational)\n• Medications and insulin\n• Diet and exercise tips\n• Prevention strategies\n\nWhat else can I help you with?`,
+  `Good question! That's a bit outside my current knowledge base. For the most accurate answer, please speak with your doctor.\n\nI'm well-equipped to answer questions about diabetes management, blood sugar, symptoms, medications, and lifestyle changes — feel free to ask!`
+];
+
+let fallbackIndex = 0;
+
+function getBotReply(userText) {
+  const lower = userText.toLowerCase();
+  for (const entry of KB) {
+    if (entry.keys.some(k => lower.includes(k))) {
+      return entry.reply;
+    }
+  }
+  const resp = FALLBACK_RESPONSES[fallbackIndex % FALLBACK_RESPONSES.length];
+  fallbackIndex++;
+  return resp;
+}
+
+function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const text = input.value.trim();
+  if (!text) return;
+
+  appendMsg('user', text);
+  input.value = '';
+  input.style.height = 'auto';
+  sendBtn.disabled = true;
+  appendTyping();
+
+  // Simulate a natural thinking delay (400–900ms)
+  const delay = 400 + Math.random() * 500;
+  setTimeout(() => {
+    removeTyping();
+    const reply = getBotReply(text);
+    appendMsg('bot', reply);
+    sendBtn.disabled = false;
+  }, delay);
+}
+</script>
+</body>
+</html>
